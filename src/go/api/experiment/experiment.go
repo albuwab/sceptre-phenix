@@ -268,6 +268,7 @@ func Create(ctx context.Context, opts ...CreateOption) error {
 	}
 
 	exp.Spec.SetVLANRange(o.vlanMin, o.vlanMax, false)
+	exp.Spec.SetUseGREMesh(o.useGRE)
 
 	exp.Spec.Init()
 

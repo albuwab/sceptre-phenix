@@ -282,8 +282,13 @@ func ApplyApps(ctx context.Context, exp *types.Experiment, opts ...Option) error
 	}
 
 	if options.Stage == ACTIONCONFIG || options.Stage == ACTIONPRESTART {
+		bridge := "phenix"
+		if exp.Spec.UseGREMesh() {
+			bridge = exp.Spec.ExperimentName()
+		}
+
 		// just in case one of the apps added some nodes to the topology...
-		exp.Spec.Topology().Init()
+		exp.Spec.Topology().Init(bridge)
 	}
 
 	return nil

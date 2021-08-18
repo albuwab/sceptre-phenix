@@ -24,10 +24,12 @@ type ExperimentSpec interface {
 	VLANs() VLANSpec
 	Schedules() map[string]string
 	RunLocal() bool
+	UseGREMesh() bool
 
 	SetVLANAlias(string, int, bool) error
 	SetVLANRange(int, int, bool) error
 	SetSchedule(map[string]string)
+	SetUseGREMesh(bool)
 
 	VerifyScenario(context.Context) error
 	ScheduleNode(string, string) error

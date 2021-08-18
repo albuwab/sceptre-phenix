@@ -14,6 +14,7 @@ type createOptions struct {
 	vlanMin  int
 	vlanMax  int
 	baseDir  string
+	useGRE   bool
 }
 
 func newCreateOptions(opts ...CreateOption) createOptions {
@@ -63,6 +64,12 @@ func CreateWithVLANMax(m int) CreateOption {
 func CreateWithBaseDirectory(b string) CreateOption {
 	return func(o *createOptions) {
 		o.baseDir = b
+	}
+}
+
+func CreateWithUseGRE(g bool) CreateOption {
+	return func(o *createOptions) {
+		o.useGRE = g
 	}
 }
 

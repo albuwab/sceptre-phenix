@@ -72,6 +72,7 @@ type ExperimentSpec struct {
 	VLANsF          *VLANSpec         `json:"vlans" yaml:"vlans" structs:"vlans" mapstructure:"vlans"`
 	SchedulesF      map[string]string `json:"schedules" yaml:"schedules" structs:"schedules" mapstructure:"schedules"`
 	RunLocalF       bool              `json:"runLocal" yaml:"runLocal" structs:"runLocal" mapstructure:"runLocal"`
+	UseGREMeshF     bool              `json:"useGREMesh" yaml:"useGREMesh" structs:"useGREMesh" mapstructure:"useGREMesh"`
 }
 
 func (this *ExperimentSpec) Init() error {
@@ -98,7 +99,12 @@ func (this *ExperimentSpec) Init() error {
 	}
 
 	if this.TopologyF != nil {
-		this.TopologyF.SetDefaults()
+		bridge := "phenix"
+		if this.UseGREMeshF {
+			bridge = this.ExperimentNameF
+		}
+
+		this.TopologyF.SetDefaults(bridge)
 
 		for _, n := range this.TopologyF.NodesF {
 			for _, i := range n.NetworkF.InterfacesF {
@@ -138,6 +144,10 @@ func (this ExperimentSpec) Schedules() map[string]string {
 
 func (this ExperimentSpec) RunLocal() bool {
 	return this.RunLocalF
+}
+
+func (this ExperimentSpec) UseGREMesh() bool {
+	return this.UseGREMeshF
 }
 
 func (this *ExperimentSpec) SetVLANAlias(a string, i int, f bool) error {
@@ -190,6 +200,10 @@ func (this *ExperimentSpec) SetVLANRange(min, max int, f bool) error {
 
 func (this *ExperimentSpec) SetSchedule(s map[string]string) {
 	this.SchedulesF = s
+}
+
+func (this *ExperimentSpec) SetUseGREMesh(g bool) {
+	this.UseGREMeshF = g
 }
 
 func (this ExperimentSpec) VerifyScenario(ctx context.Context) error {

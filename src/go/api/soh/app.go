@@ -97,7 +97,12 @@ func (this *SOH) Configure(ctx context.Context, exp *types.Experiment) error {
 				return fmt.Errorf("building Elastic server node: %w", err)
 			}
 
-			exp.Spec.Topology().Init()
+			bridge := "phenix"
+			if exp.Spec.UseGREMesh() {
+				bridge = exp.Spec.ExperimentName()
+			}
+
+			exp.Spec.Topology().Init(bridge)
 		}
 	}
 

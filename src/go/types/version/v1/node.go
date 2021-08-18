@@ -324,7 +324,7 @@ func (this Injection) Permissions() string {
 	return this.PermissionsF
 }
 
-func (this *Node) SetDefaults() {
+func (this *Node) SetDefaults(bridge string) {
 	if this.GeneralF.VMTypeF == "" {
 		this.GeneralF.VMTypeF = "kvm"
 	}
@@ -363,7 +363,7 @@ func (this *Node) SetDefaults() {
 		this.OverridesF = make(map[string]string)
 	}
 
-	this.NetworkF.SetDefaults()
+	this.NetworkF.SetDefaults(bridge)
 }
 
 func (this Node) FileInjects(baseDir string) string {

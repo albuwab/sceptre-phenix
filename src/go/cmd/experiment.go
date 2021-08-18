@@ -155,6 +155,7 @@ func newExperimentCreateCmd() *cobra.Command {
 				experiment.CreateWithTopology(topology),
 				experiment.CreateWithScenario(scenario),
 				experiment.CreateWithBaseDirectory(MustGetString(cmd.Flags(), "base-dir")),
+				experiment.CreateWithUseGRE(MustGetBool(cmd.Flags(), "use-gre-mesh")),
 				experiment.CreateWithVLANMin(MustGetInt(cmd.Flags(), "vlan-min")),
 				experiment.CreateWithVLANMax(MustGetInt(cmd.Flags(), "vlan-max")),
 			}
@@ -178,6 +179,7 @@ func newExperimentCreateCmd() *cobra.Command {
 	cmd.MarkFlagRequired("topology")
 	cmd.Flags().StringP("scenario", "s", "", "Name of an existing scenario to use (optional)")
 	cmd.Flags().StringP("base-dir", "d", "", "Base directory to use for experiment (optional)")
+	cmd.Flags().BoolP("use-gre-mesh", "g", false, "Use GRE mesh for trunking VLANs")
 	cmd.Flags().Int("vlan-min", 0, "VLAN pool minimum")
 	cmd.Flags().Int("vlan-max", 0, "VLAN pool maximum")
 

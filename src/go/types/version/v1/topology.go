@@ -78,13 +78,13 @@ func (this *TopologySpec) RemoveNode(hostname string) {
 	}
 }
 
-func (this *TopologySpec) Init() error {
-	this.SetDefaults()
+func (this *TopologySpec) Init(bridge string) error {
+	this.SetDefaults(bridge)
 	return nil
 }
 
-func (this *TopologySpec) SetDefaults() {
+func (this *TopologySpec) SetDefaults(bridge string) {
 	for _, n := range this.NodesF {
-		n.SetDefaults()
+		n.SetDefaults(bridge)
 	}
 }

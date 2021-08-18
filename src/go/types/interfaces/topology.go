@@ -9,7 +9,8 @@ type TopologySpec interface {
 	AddNode(string, string) NodeSpec
 	RemoveNode(string)
 
-	Init() error
+	// accepts name of default bridge
+	Init(string) error
 }
 
 type NodeSpec interface {

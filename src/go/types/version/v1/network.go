@@ -455,10 +455,10 @@ func (this AddrPort) Port() int {
 	return this.PortF
 }
 
-func (this *Network) SetDefaults() {
+func (this *Network) SetDefaults(bridge string) {
 	for idx, iface := range this.InterfacesF {
 		if iface.BridgeF == "" {
-			iface.BridgeF = "phenix"
+			iface.BridgeF = bridge
 			this.InterfacesF[idx] = iface
 		}
 	}
