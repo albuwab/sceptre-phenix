@@ -24,14 +24,16 @@ import (
 )
 
 // POST /workflow/apply/{branch}
+// POST /workflow/apply/{repo}/{branch}
 func ApplyWorkflow(w http.ResponseWriter, r *http.Request) error {
 	log.Debug("ApplyWorkflow HTTP handler called")
 
 	var (
-		ctx   = r.Context()
-		role  = ctx.Value("role").(rbac.Role)
-		vars  = mux.Vars(r)
-		scope = vars["branch"]
+		ctx    = r.Context()
+		role   = ctx.Value("role").(rbac.Role)
+		vars   = mux.Vars(r)
+		repo   = vars["repo"]
+		branch = vars["branch"]
 	)
 
 	if !role.Allowed("workflow", "create") {
@@ -52,7 +54,7 @@ func ApplyWorkflow(w http.ResponseWriter, r *http.Request) error {
 			return err.SetStatus(http.StatusInternalServerError)
 		}
 
-		cfg, err = store.NewConfigFromJSON(body, "{{BRANCH_NAME}}", scope)
+		cfg, err = store.NewConfigFromJSON(body, "{{REPO_NAME}}", repo, "{{BRANCH_NAME}}", branch)
 		if err != nil {
 			return weberror.NewWebError(err, "unable to parse phenix workflow config")
 		}
@@ -63,7 +65,7 @@ func ApplyWorkflow(w http.ResponseWriter, r *http.Request) error {
 			return err.SetStatus(http.StatusInternalServerError)
 		}
 
-		cfg, err = store.NewConfigFromYAML(body, "{{BRANCH_NAME}}", scope)
+		cfg, err = store.NewConfigFromYAML(body, "{{REPO_NAME}}", repo, "{{BRANCH_NAME}}", branch)
 		if err != nil {
 			return weberror.NewWebError(err, "unable to parse phenix workflow config")
 		}
@@ -92,11 +94,27 @@ func ApplyWorkflow(w http.ResponseWriter, r *http.Request) error {
 			continue
 		}
 
-		if branch, ok := annotations["phenix.workflow/branch"]; ok {
-			if branch == scope {
-				exps = append(exps, exp)
+		if repo != "" {
+			wfRepo, ok := annotations["phenix.workflow/repo"]
+			if !ok {
+				continue
+			}
+
+			if wfRepo != repo {
+				continue
 			}
 		}
+
+		wfBranch, ok := annotations["phenix.workflow/branch"]
+		if !ok {
+			continue
+		}
+
+		if wfBranch != branch {
+			continue
+		}
+
+		exps = append(exps, exp)
 	}
 
 	switch len(exps) {
@@ -114,7 +132,11 @@ func ApplyWorkflow(w http.ResponseWriter, r *http.Request) error {
 
 		defer cache.UnlockExperiment(expName)
 
-		annotations := map[string]string{"phenix.workflow/branch": scope}
+		annotations := map[string]string{"phenix.workflow/branch": branch}
+
+		if repo != "" {
+			annotations["phenix.workflow/repo"] = repo
+		}
 
 		opts := []experiment.CreateOption{
 			experiment.CreateWithName(expName),
@@ -293,7 +315,15 @@ func ApplyWorkflow(w http.ResponseWriter, r *http.Request) error {
 			}
 		}
 	default:
-		err := weberror.NewWebError(nil, "more than one experiment is mapped to workflow branch %s", scope)
+		var msg string
+
+		if repo == "" {
+			msg = fmt.Sprintf("more than one experiment is mapped to workflow branch %s", branch)
+		} else {
+			msg = fmt.Sprintf("more than one experiment is mapped to workflow repo %s and branch %s", repo, branch)
+		}
+
+		err := weberror.NewWebError(nil, msg)
 		return err.SetStatus(http.StatusInternalServerError)
 	}
 
@@ -301,14 +331,16 @@ func ApplyWorkflow(w http.ResponseWriter, r *http.Request) error {
 }
 
 // POST /workflow/configs/{branch}
+// POST /workflow/configs/{repo}/{branch}
 func WorkflowUpsertConfig(w http.ResponseWriter, r *http.Request) error {
 	log.Debug("WorkflowUpsertConfig HTTP handler called")
 
 	var (
-		ctx   = r.Context()
-		role  = ctx.Value("role").(rbac.Role)
-		vars  = mux.Vars(r)
-		scope = vars["branch"]
+		ctx    = r.Context()
+		role   = ctx.Value("role").(rbac.Role)
+		vars   = mux.Vars(r)
+		repo   = vars["repo"]
+		branch = vars["branch"]
 	)
 
 	var (
@@ -324,7 +356,7 @@ func WorkflowUpsertConfig(w http.ResponseWriter, r *http.Request) error {
 			return err.SetStatus(http.StatusInternalServerError)
 		}
 
-		cfg, err = store.NewConfigFromJSON(body, "{{BRANCH_NAME}}", scope)
+		cfg, err = store.NewConfigFromJSON(body, "{{REPO_NAME}}", repo, "{{BRANCH_NAME}}", branch)
 		if err != nil {
 			return weberror.NewWebError(err, "unable to parse JSON config")
 		}
@@ -335,7 +367,7 @@ func WorkflowUpsertConfig(w http.ResponseWriter, r *http.Request) error {
 			return err.SetStatus(http.StatusInternalServerError)
 		}
 
-		cfg, err = store.NewConfigFromYAML(body, "{{BRANCH_NAME}}", scope)
+		cfg, err = store.NewConfigFromYAML(body, "{{REPO_NAME}}", repo, "{{BRANCH_NAME}}", branch)
 		if err != nil {
 			return weberror.NewWebError(err, "unable to parse YAML config")
 		}

@@ -188,7 +188,9 @@ func Start(opts ...ServerOption) error {
 	api.HandleFunc("/errors/{uuid}", GetError).Methods("GET", "OPTIONS")
 	api.HandleFunc("/ws", broker.ServeWS).Methods("GET")
 	api.Handle("/workflow/apply/{branch}", weberror.ErrorHandler(ApplyWorkflow)).Methods("POST", "OPTIONS")
+	api.Handle("/workflow/apply/{repo}/{branch}", weberror.ErrorHandler(ApplyWorkflow)).Methods("POST", "OPTIONS")
 	api.Handle("/workflow/configs/{branch}", weberror.ErrorHandler(WorkflowUpsertConfig)).Methods("POST", "OPTIONS")
+	api.Handle("/workflow/configs/{repo}/{branch}", weberror.ErrorHandler(WorkflowUpsertConfig)).Methods("POST", "OPTIONS")
 
 	if o.allowCORS {
 		log.Info("CORS is enabled on HTTP API endpoints")
