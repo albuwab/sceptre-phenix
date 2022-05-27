@@ -168,10 +168,6 @@ func ApplyWorkflow(w http.ResponseWriter, r *http.Request) error {
 		}
 
 		if exp.Running() {
-			if !wf.AutoRestart() {
-				return nil
-			}
-
 			var err error
 
 			if _, err = stopExperiment(expName); err != nil {
