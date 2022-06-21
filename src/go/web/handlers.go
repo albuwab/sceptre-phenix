@@ -171,6 +171,11 @@ func CreateExperiment(w http.ResponseWriter, r *http.Request) {
 		experiment.CreateWithVLANMax(int(req.VlanMax)),
 	}
 
+	if req.WorkflowRepo != "" {
+		annotations := map[string]string{"phenix.workflow/repo": req.WorkflowRepo}
+		opts = append(opts, experiment.CreateWithAnnotations(annotations))
+	}
+
 	if req.WorkflowBranch != "" {
 		annotations := map[string]string{"phenix.workflow/branch": req.WorkflowBranch}
 		opts = append(opts, experiment.CreateWithAnnotations(annotations))

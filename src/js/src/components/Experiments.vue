@@ -57,6 +57,9 @@
                     <b-numberinput min="0" max="4094" type="is-light" size="is-small" controls-alignment="right" controls-position="compact" placeholder="max" v-model="createModal.vlan_max" />
                   </b-field>
                 </b-field>
+                <b-field label="Git Workflow Repo Name">
+                  <b-input type="text" v-model="createModal.repo" />
+                </b-field>
                 <b-field label="Git Workflow Branch Name">
                   <b-input type="text" v-model="createModal.branch" />
                 </b-field>
@@ -595,6 +598,7 @@
           scenario: this.createModal.scenario,
           vlan_min: +this.createModal.vlan_min,
           vlan_max: +this.createModal.vlan_max,
+          workflow_repo: this.createModal.repo,
           workflow_branch: this.createModal.branch,
         }
         
@@ -772,6 +776,7 @@
           scenario: null,
           vlan_min: null,
           vlan_max: null,
+          repo: null,
           branch: null
         },
         experiments: [],
