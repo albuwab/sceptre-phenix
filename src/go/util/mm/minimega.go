@@ -155,7 +155,7 @@ func (this Minimega) GetVMInfo(opts ...Option) VMs {
 			State:    row["state"],
 			Running:  row["state"] == "RUNNING",
 			CCActive: activeC2[row["uuid"]],
-			CdRom: row["cdrom"],
+			CdRom:    row["cdrom"],
 		}
 
 		s := row["vlan"]
@@ -1118,6 +1118,26 @@ func (Minimega) MeshShell(host, command string) error {
 
 	if err := mmcli.ErrorResponse(mmcli.Run(cmd)); err != nil {
 		return fmt.Errorf("running shell command (host %s) %s: %w", host, command, err)
+	}
+
+	return nil
+}
+
+func (Minimega) MeshBackground(host, command string) error {
+	cmd := mmcli.NewCommand()
+
+	if host == "" {
+		host = Headnode()
+	}
+
+	if IsHeadnode(host) {
+		cmd.Command = fmt.Sprintf("background %s", command)
+	} else {
+		cmd.Command = fmt.Sprintf("mesh send %s background %s", host, command)
+	}
+
+	if err := mmcli.ErrorResponse(mmcli.Run(cmd)); err != nil {
+		return fmt.Errorf("backgrounding shell command (host %s) %s: %w", host, command, err)
 	}
 
 	return nil
