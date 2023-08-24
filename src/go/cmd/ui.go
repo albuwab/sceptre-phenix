@@ -75,6 +75,10 @@ func newUICmd() *cobra.Command {
 				opts = append(opts, web.ServeWithMiddlewareLogging("full"))
 			}
 
+			if MustGetBool(cmd.Flags(), "trace") {
+				opts = append(opts, web.ServeWithMiddlewareTracing())
+			}
+
 			if MustGetBool(cmd.Flags(), "unbundled") {
 				opts = append(opts, web.ServeUnbundled())
 			}
@@ -144,9 +148,11 @@ func newUICmd() *cobra.Command {
 
 	cmd.Flags().Bool("log-requests", false, "Log API requests")
 	cmd.Flags().Bool("log-full", false, "Log API requests and responses")
+	cmd.Flags().Bool("trace", false, "Trace API requests")
 
 	cmd.Flags().MarkHidden("log-requests")
 	cmd.Flags().MarkHidden("log-full")
+	cmd.Flags().MarkHidden("trace")
 
 	return cmd
 }
