@@ -562,6 +562,8 @@ func (Vrouter) processACL(md map[string]interface{}, network ifaces.NodeNetwork)
 		ruleset, ok := iface.(ifaces.NodeNetworkRuleset)
 		if !ok {
 			// TODO: handle this better? Like warn the user perhaps?
+			//if !iface.(ifaces.NodeNetworkRulesetRule.ID){below line?}
+			return fmt.Errorf("Failed to process this ruleset - %w - CONTINUING! ", err)
 			continue
 		}
 
